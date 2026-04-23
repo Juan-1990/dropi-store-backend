@@ -1,11 +1,18 @@
 // backend/src/services/paymentService.js
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// Crear PaymentIntent — inicia el proceso de pago
 const createPaymentIntent = async (amount, currency = 'cop', metadata = {}) => {
   try {
+    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'demo') {
+      // Modo demo — simula el pago
+      return {
+        clientSecret: `demo_secret_${Date.now()}`,
+        paymentIntentId: `demo_intent_${Date.now()}`,
+      };
+    }
+
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
     const paymentIntent = await stripe.paymentIntents.create({
-      amount:   Math.round(amount * 100), // Stripe usa centavos
+      amount:   Math.round(amount * 100),
       currency,
       metadata,
       automatic_payment_methods: { enabled: true },
@@ -20,9 +27,13 @@ const createPaymentIntent = async (amount, currency = 'cop', metadata = {}) => {
   }
 };
 
-// Verificar estado de un pago
 const verifyPayment = async (paymentIntentId) => {
   try {
+    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'demo') {
+      return { status: 'succeeded', paid: true, amount: 0 };
+    }
+
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
     return {
       status: paymentIntent.status,
