@@ -17,7 +17,12 @@ app.use(helmet()); // Cabeceras de seguridad HTTP
 })); */
 
 app.use(cors({
-  origin: '*',
+  origin: [
+    'http://localhost:5173',
+    'https://dropi-store-frontend.vercel.app',
+    'https://dropi-store-frontend-git-main-juan-1990s-projects.vercel.app',
+    'https://dropi-store-frontend-guq0dva52-juan-1990s-projects.vercel.app',
+  ],
   credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
